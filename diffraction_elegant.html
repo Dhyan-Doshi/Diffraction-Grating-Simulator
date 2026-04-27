@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diffraction Grating — Optical Instrument</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@300;400&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream:   #f7f3ec;
+  --ivory:   #fdf9f3;
+  --navy:    #0e1b2e;
+  --navy2:   #162338;
+  --gold:    #b8860b;
+  --gold2:   #d4a017;
+  --gold3:   #f0c040;
+  --rust:    #8b3a2a;
+  --muted:   #6b6257;
+  --line:    #ddd4c4;
+  --ink:     #1a1410;
+  --warm:    #c9bfaf;
+}
+
+html { background: var(--cream); }
+
+body {
+  font-family: 'EB Garamond', Georgia, serif;
+  background: var(--cream);
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 0 80px;
+  position: relative;
+}
+
+/* Grain texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px;
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* ── Masthead ───────────────────────────────────────────── */
+.masthead {
+  width: 100%;
+  background: var(--navy);
+  padding: 52px 48px 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  animation: revealDown 1s cubic-bezier(.16,1,.3,1) both;
+}
+
+@keyframes revealDown {
+  from { opacity: 0; transform: translateY(-24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.masthead-rule {
+  width: 100%;
+  max-width: 860px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.rule-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.rule-diamond {
+  width: 6px; height: 6px;
+  background: var(--gold2);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+.journal-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold2);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.masthead-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(38px, 5vw, 60px);
+  font-weight: 400;
+  color: var(--ivory);
+  text-align: center;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.masthead-title em {
+  font-style: italic;
+  color: var(--gold3);
+}
+
+.masthead-subtitle {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 18px;
+  color: var(--warm);
+  margin-top: 10px;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+.equation-band {
+  width: 100%;
+  max-width: 860px;
+  margin-top: 32px;
+  padding: 20px 32px;
+  border: 1px solid rgba(184,134,11,0.3);
+  border-radius: 2px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255,255,255,0.04);
+}
+
+.eq-main {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 26px;
+  color: var(--gold3);
+  letter-spacing: 0.04em;
+}
+
+.eq-legend {
+  font-size: 13px;
+  color: var(--warm);
+  line-height: 2;
+  text-align: right;
+  font-style: italic;
+}
+
+/* ── Body layout ─────────────────────────────────────────── */
+.body-wrap {
+  width: 100%;
+  max-width: 940px;
+  padding: 0 24px;
+  margin-top: -2px;
+}
+
+/* ── Section heading ─────────────────────────────────────── */
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 32px 0 16px;
+  animation: fadeUp 0.8s 0.3s ease both;
+}
+
+.section-number {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--gold);
+  width: 24px;
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--navy);
+}
+
+.section-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Main instrument grid ────────────────────────────────── */
+.instrument {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  grid-template-rows: auto auto;
+  gap: 0;
+  border: 1px solid var(--line);
+  background: var(--line);
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: 0 4px 32px rgba(14,27,46,0.08), 0 1px 4px rgba(14,27,46,0.06);
+  animation: fadeUp 0.8s 0.4s ease both;
+}
+
+/* ── Controls column ─────────────────────────────────────── */
+.controls {
+  background: var(--navy);
+  grid-row: 1 / 3;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ctrl-head {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold2);
+  margin-bottom: 22px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(184,134,11,0.25);
+}
+
+.param { margin-bottom: 24px; }
+
+.param-name {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--warm);
+  margin-bottom: 6px;
+}
+
+.param-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.param-symbol {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 15px;
+  color: rgba(240,192,64,0.6);
+}
+
+.param-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--gold3);
+  letter-spacing: -0.02em;
+  transition: color 0.15s;
+}
+
+.param-unit {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--warm);
+  margin-left: 3px;
+}
+
+/* Slider */
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%; height: 1px;
+  outline: none; cursor: pointer;
+  border-radius: 1px;
+  margin-bottom: 5px;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+  height: 1px;
+  border-radius: 1px;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: var(--navy);
+  border: 2px solid var(--gold2);
+  margin-top: -6px;
+  box-shadow: 0 0 0 3px rgba(184,134,11,0.15);
+  transition: transform .2s, box-shadow .2s;
+}
+
+input[type=range]:active::-webkit-slider-thumb {
+  transform: scale(1.35);
+  box-shadow: 0 0 0 5px rgba(184,134,11,0.2);
+}
+
+.pbounds {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  color: rgba(201,191,175,0.4);
+}
+
+.ctrl-sep {
+  height: 1px;
+  background: rgba(184,134,11,0.2);
+  margin: 4px 0 20px;
+}
+
+/* Derived readouts */
+.readout {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(184,134,11,0.2);
+  border-radius: 2px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.readout-left {}
+.readout-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--warm);
+  margin-bottom: 5px;
+}
+.readout-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gold3);
+}
+.readout-formula {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  color: rgba(201,191,175,0.4);
+  text-align: right;
+  line-height: 1.8;
+}
+
+.ctrl-hint {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: rgba(201,191,175,0.5);
+  line-height: 1.7;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid rgba(184,134,11,0.15);
+}
+
+/* ── Canvas cell ─────────────────────────────────────────── */
+.vis-cell {
+  background: var(--ivory);
+  padding: 0;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+}
+
+.cell-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 11px 18px;
+  border-bottom: 1px solid var(--line);
+  background: var(--ivory);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cell-tag {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: 0;
+}
+
+canvas { display: block; width: 100%; }
+
+/* ── Results cell ────────────────────────────────────────── */
+.results-cell {
+  background: var(--ivory);
+}
+
+.res-header {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 11px 18px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+}
+
+.res-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 0;
+  background: var(--line);
+}
+
+.rc {
+  background: var(--ivory);
+  padding: 16px 14px;
+  transition: background 0.2s;
+}
+
+.rc:hover { background: #f2ece0; }
+
+.rc-swatch {
+  width: 24px; height: 3px;
+  border-radius: 2px;
+  margin-bottom: 11px;
+}
+
+.rc-name {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 7px;
+}
+
+.rc-lam {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.rc-unit {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  color: var(--muted);
+  margin: 5px 0 8px;
+}
+
+.rc-theta {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.rc-dev {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  margin-top: 5px;
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.footer {
+  width: 100%;
+  max-width: 940px;
+  padding: 0 24px;
+  margin-top: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: fadeUp 0.8s 0.6s ease both;
+}
+
+.footer-text {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.footer-rule {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer-line { width: 60px; height: 1px; background: var(--line); }
+.footer-diamond {
+  width: 5px; height: 5px;
+  background: var(--gold);
+  transform: rotate(45deg);
+}
+</style>
+</head>
+<body>
+
+<!-- Masthead -->
+<div class="masthead">
+  <div class="masthead-rule">
+    <div class="rule-line"></div>
+    <div class="rule-diamond"></div>
+    <div class="rule-line"></div>
+  </div>
+  <div class="journal-tag">Optical Physics · Laboratory Instrument · Mercury Spectroscopy</div>
+  <h1 class="masthead-title">The Diffraction <em>Grating</em></h1>
+  <div class="masthead-subtitle">An interactive study of spectral dispersion and angular deviation</div>
+  <div class="equation-band">
+    <div class="eq-main">d · sin θ = m · λ</div>
+    <div class="eq-legend">
+      d — grating element (Å) &nbsp;·&nbsp; θ — diffraction angle<br>
+      m — spectral order &nbsp;·&nbsp; λ — wavelength (Å)
+    </div>
+  </div>
+</div>
+
+<div class="body-wrap">
+
+  <div class="section-head">
+    <span class="section-number">§ 1</span>
+    <span class="section-title">Interactive Instrument</span>
+    <div class="section-rule"></div>
+  </div>
+
+  <div class="instrument">
+
+    <!-- Controls -->
+    <div class="controls">
+      <div class="ctrl-head">Variables</div>
+
+      <div class="param">
+        <div class="param-name">N — Lines per inch</div>
+        <div class="param-row">
+          <span class="param-symbol">N =</span>
+          <span><span class="param-val" id="v-N">15,000</span></span>
+        </div>
+        <input type="range" id="sl-N" min="5000" max="50000" step="500" value="15000"
+          style="background:linear-gradient(90deg,#b8860b 30%,rgba(201,191,175,0.15) 30%)">
+        <div class="pbounds"><span>5k</span><span>50k</span></div>
+      </div>
+
+      <div class="param">
+        <div class="param-name">m — Spectral order</div>
+        <div class="param-row">
+          <span class="param-symbol">m =</span>
+          <span><span class="param-val" id="v-m">1</span></span>
+        </div>
+        <input type="range" id="sl-m" min="1" max="3" step="1" value="1"
+          style="background:linear-gradient(90deg,#b8860b 0%,rgba(201,191,175,0.15) 0%)">
+        <div class="pbounds"><span>1st</span><span>2nd</span><span>3rd</span></div>
+      </div>
+
+      <div class="param">
+        <div class="param-name">λ — Wavelength</div>
+        <div class="param-row">
+          <span class="param-symbol">λ =</span>
+          <span><span class="param-val" id="v-lam">5460</span><span class="param-unit">Å</span></span>
+        </div>
+        <input type="range" id="sl-lam" min="3800" max="7000" step="10" value="5460"
+          style="background:linear-gradient(90deg,#b8860b 51%,rgba(201,191,175,0.15) 51%)">
+        <div class="pbounds"><span>3800</span><span>7000</span></div>
+      </div>
+
+      <div class="ctrl-sep"></div>
+      <div class="ctrl-head" style="margin-bottom:14px;">Computed</div>
+
+      <div class="readout">
+        <div class="readout-left">
+          <div class="readout-label">Grating element d</div>
+          <div class="readout-val" id="v-d">16,933.3 Å</div>
+        </div>
+        <div class="readout-formula">2.54×10⁸<br>─────<br>&nbsp;&nbsp;N</div>
+      </div>
+
+      <div class="readout">
+        <div class="readout-left">
+          <div class="readout-label">Angle θ for λ</div>
+          <div class="readout-val" id="v-theta">18.80°</div>
+        </div>
+        <div class="readout-formula">arcsin<br>(mλ/d)</div>
+      </div>
+
+      <p class="ctrl-hint">Move any slider to observe changes in diffraction angles and spectral positions in real time.</p>
+    </div>
+
+    <!-- Canvas -->
+    <div class="vis-cell">
+      <div class="cell-label">
+        <span>Optical Path Diagram</span>
+        <span class="cell-tag">Mercury (Hg) source</span>
+      </div>
+      <canvas id="cv"></canvas>
+    </div>
+
+    <!-- Results -->
+    <div class="results-cell">
+      <div class="res-header">
+        <span>Spectral Lines — Measured vs. Standard</span>
+        <span style="font-style:italic;font-family:'EB Garamond',serif;letter-spacing:0">deviation from accepted value</span>
+      </div>
+      <div class="res-grid" id="results"></div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-text">Fraunhofer diffraction · plane transmission grating</div>
+    <div class="footer-rule">
+      <div class="footer-line"></div>
+      <div class="footer-diamond"></div>
+      <div class="footer-line"></div>
+    </div>
+    <div class="footer-text">d · sin θ = m · λ</div>
+  </div>
+
+</div>
+
+<script>
+// ── Mercury lines (Ångströms) ─────────────────────────────────────────────
+const HG = [
+  { name: 'Violet', std: 4047, color: '#7b4fa6', swatch: '#9b6fc6' },
+  { name: 'Green',  std: 5461, color: '#1a7a45', swatch: '#2eac62' },
+  { name: 'Yellow', std: 5790, color: '#9a6c00', swatch: '#d4a017' },
+  { name: 'Red',    std: 6234, color: '#9b2a1a', swatch: '#d94030' },
+]
+
+const S = { N: 15000, m: 1, lam: 5460 }
+
+// ── Physics ───────────────────────────────────────────────────────────────
+const getD     = ()       => 2.54e8 / S.N
+const getSin   = (m,l,d) => (m * l) / d
+const getTheta = (m,l,d) => { const s=getSin(m,l,d); return s>=1 ? null : Math.asin(s)*180/Math.PI }
+const fmt      = (n, dec=0) => n.toFixed(dec).replace(/\B(?=(\d{3})+(?!\d))/g,',')
+
+// ── Colour mapping (Ångströms) ────────────────────────────────────────────
+function lamToRGB(lam) {
+  let r,g,b
+  if      (lam < 4400) { r=(4400-lam)/600; g=0;              b=1 }
+  else if (lam < 4900) { r=0;             g=(lam-4400)/500;  b=1 }
+  else if (lam < 5100) { r=0;             g=1;               b=(5100-lam)/200 }
+  else if (lam < 5800) { r=(lam-5100)/700;g=1;               b=0 }
+  else if (lam < 6450) { r=1;             g=(6450-lam)/650;  b=0 }
+  else                 { r=1;             g=0;               b=0 }
+  return [Math.round(r*220), Math.round(g*200), Math.round(b*210)]
+}
+
+// ── Slider track fill ─────────────────────────────────────────────────────
+function trackFill(sl) {
+  const pct = ((+sl.value - +sl.min) / (+sl.max - +sl.min) * 100).toFixed(1)
+  sl.style.background = `linear-gradient(90deg, #b8860b ${pct}%, rgba(201,191,175,0.15) ${pct}%)`
+}
+
+// ── Canvas ────────────────────────────────────────────────────────────────
+function draw() {
+  const cv = document.getElementById('cv')
+  const W  = cv.offsetWidth
+  const H  = Math.round(W * 0.42)
+  cv.width = W; cv.height = H
+  const ctx = cv.getContext('2d')
+  const D   = getD()
+
+  // Background — warm ivory with subtle vignette
+  ctx.fillStyle = '#fdf9f3'; ctx.fillRect(0, 0, W, H)
+  const vg = ctx.createRadialGradient(W/2,H/2,H*0.2, W/2,H/2,H*0.9)
+  vg.addColorStop(0, 'rgba(0,0,0,0)')
+  vg.addColorStop(1, 'rgba(14,27,46,0.06)')
+  ctx.fillStyle = vg; ctx.fillRect(0,0,W,H)
+
+  // Faint ruled lines (like graph paper)
+  ctx.strokeStyle = 'rgba(14,27,46,0.04)'; ctx.lineWidth = 1
+  for (let y=0; y<H; y+=24) {
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke()
+  }
+
+  const gx      = Math.round(W * 0.27)
+  const cy      = Math.round(H / 2)
+  const screenX = W - 32
+  const rayLen  = screenX - gx
+
+  // ── Incident ray ──────────────────────────────────────────────────────
+  const ig = ctx.createLinearGradient(20,cy,gx,cy)
+  ig.addColorStop(0,'rgba(14,27,46,0)')
+  ig.addColorStop(0.7,'rgba(14,27,46,0.12)')
+  ig.addColorStop(1,'rgba(14,27,46,0.35)')
+  ctx.strokeStyle = ig; ctx.lineWidth = 2.5
+  ctx.beginPath(); ctx.moveTo(20,cy); ctx.lineTo(gx,cy); ctx.stroke()
+  ctx.fillStyle='rgba(14,27,46,0.35)'; ctx.font='italic 11px "EB Garamond"'
+  ctx.fillText('incident white light', 22, cy-10)
+
+  // ── Grating ───────────────────────────────────────────────────────────
+  const gh = 84, gt = cy-gh/2
+  for (let i=0; i<12; i++) {
+    const y = gt + i*(gh/11)
+    ctx.fillStyle = i%2===0 ? 'rgba(14,27,46,0.85)' : 'rgba(14,27,46,0.08)'
+    ctx.fillRect(gx-4, y, 8, gh/11+0.5)
+  }
+  ctx.strokeStyle = '#0e1b2e'; ctx.lineWidth = 1.5
+  ctx.strokeRect(gx-6, gt-4, 12, gh+8)
+  // Gold accent lines on grating
+  ctx.strokeStyle = '#b8860b'; ctx.lineWidth = 0.5
+  ctx.strokeRect(gx-7, gt-5, 14, gh+10)
+
+  ctx.fillStyle = 'rgba(14,27,46,0.4)'; ctx.font = '9px "DM Mono"'
+  ctx.fillText('grating', gx-16, cy+gh/2+18)
+  ctx.fillText(`N = ${fmt(S.N)}`, gx-16, cy+gh/2+30)
+
+  // ── 0th order dashed ──────────────────────────────────────────────────
+  ctx.strokeStyle='rgba(14,27,46,0.12)'; ctx.lineWidth=1; ctx.setLineDash([5,5])
+  ctx.beginPath(); ctx.moveTo(gx,cy); ctx.lineTo(screenX,cy); ctx.stroke()
+  ctx.setLineDash([])
+  ctx.fillStyle='rgba(14,27,46,0.3)'; ctx.font='italic 10px "EB Garamond"'
+  ctx.fillText('m = 0', screenX-42, cy-8)
+
+  // ── Screen ────────────────────────────────────────────────────────────
+  ctx.strokeStyle='rgba(14,27,46,0.25)'; ctx.lineWidth=2
+  ctx.beginPath(); ctx.moveTo(screenX,14); ctx.lineTo(screenX,H-14); ctx.stroke()
+  // Gold cap lines
+  ctx.strokeStyle='#b8860b'; ctx.lineWidth=1.5
+  ctx.beginPath(); ctx.moveTo(screenX-4,14); ctx.lineTo(screenX+4,14); ctx.stroke()
+  ctx.beginPath(); ctx.moveTo(screenX-4,H-14); ctx.lineTo(screenX+4,H-14); ctx.stroke()
+  ctx.fillStyle='rgba(14,27,46,0.35)'; ctx.font='9px "DM Mono"'
+  ctx.fillText('screen', screenX-24, H-5)
+
+  // ── Hg diffracted rays ────────────────────────────────────────────────
+  HG.forEach(line => {
+    const s = getSin(S.m, line.std, D)
+    if (s>=1) return
+    const th = Math.asin(s)
+    const x2 = gx + rayLen*Math.cos(th)
+    const y2 = cy - rayLen*Math.sin(th)
+
+    // Soft glow
+    ctx.strokeStyle = line.swatch+'28'; ctx.lineWidth=8
+    ctx.beginPath(); ctx.moveTo(gx,cy); ctx.lineTo(x2,y2); ctx.stroke()
+    // Core
+    ctx.strokeStyle = line.swatch+'99'; ctx.lineWidth=1.5
+    ctx.beginPath(); ctx.moveTo(gx,cy); ctx.lineTo(x2,y2); ctx.stroke()
+
+    // Mirror below
+    const y2m = cy+(cy-y2)
+    if (y2m < H-12) {
+      ctx.strokeStyle=line.swatch+'20'; ctx.lineWidth=2; ctx.setLineDash([3,5])
+      ctx.beginPath(); ctx.moveTo(gx,cy); ctx.lineTo(x2,y2m); ctx.stroke()
+      ctx.setLineDash([])
+    } else { ctx.setLineDash([]) }
+
+    // Angle arc
+    ctx.strokeStyle=line.swatch+'45'; ctx.lineWidth=1
+    ctx.beginPath(); ctx.arc(gx,cy,30,-th,0,false); ctx.stroke()
+
+    // Label
+    if (x2 < screenX-70) {
+      ctx.fillStyle=line.color; ctx.font='italic 10px "EB Garamond"'
+      ctx.fillText(`${line.name}  ${(th*180/Math.PI).toFixed(1)}°`, x2+6, y2-5)
+    }
+
+    // Screen spot
+    const hitY = cy-(screenX-gx)*Math.tan(th)
+    if (hitY>12 && hitY<H-12) {
+      const gr = ctx.createRadialGradient(screenX,hitY,0,screenX,hitY,12)
+      gr.addColorStop(0, line.swatch+'ee')
+      gr.addColorStop(0.4, line.swatch+'66')
+      gr.addColorStop(1,'transparent')
+      ctx.fillStyle=gr; ctx.fillRect(screenX-14,hitY-12,28,24)
+      ctx.fillStyle=line.swatch
+      ctx.beginPath(); ctx.arc(screenX,hitY,3.5,0,Math.PI*2); ctx.fill()
+    }
+  })
+
+  // ── Selected λ ────────────────────────────────────────────────────────
+  const ss = getSin(S.m,S.lam,D)
+  if (ss<1) {
+    const th2 = Math.asin(ss)
+    const [r,g,b] = lamToRGB(S.lam)
+    const x2s = gx+rayLen*Math.cos(th2)
+    const y2s = cy-rayLen*Math.sin(th2)
+
+    ctx.strokeStyle=`rgba(${r},${g},${b},0.15)`; ctx.lineWidth=16
+    ctx.beginPath(); ctx.moveTo(gx,cy); ctx.lineTo(x2s,y2s); ctx.stroke()
+    ctx.strokeStyle=`rgba(${r},${g},${b},0.5)`; ctx.lineWidth=3
+    ctx.beginPath(); ctx.moveTo(gx,cy); ctx.lineTo(x2s,y2s); ctx.stroke()
+    ctx.fillStyle=`rgb(${r},${g},${b})`
+    ctx.beginPath(); ctx.arc(x2s,y2s,5,0,Math.PI*2); ctx.fill()
+
+    // θ annotation
+    const midX = gx + (rayLen*0.45)*Math.cos(th2)
+    const midY = cy - (rayLen*0.45)*Math.sin(th2)
+    ctx.fillStyle=`rgba(${r},${g},${b},0.8)`
+    ctx.font='italic 11px "EB Garamond"'
+    ctx.fillText(`θ = ${(th2*180/Math.PI).toFixed(2)}°`, midX+8, midY-4)
+  }
+
+  // ── Corner legend ─────────────────────────────────────────────────────
+  ctx.fillStyle='rgba(14,27,46,0.2)'; ctx.font='9px "DM Mono"'
+  ctx.fillText(`d = ${fmt(D,1)} Å`, 10, H-8)
+}
+
+// ── Update ────────────────────────────────────────────────────────────────
+function update() {
+  const D  = getD()
+  const th = getTheta(S.m,S.lam,D)
+
+  document.getElementById('v-N').textContent   = fmt(S.N)
+  document.getElementById('v-m').textContent   = S.m
+  document.getElementById('v-lam').textContent = fmt(S.lam)
+  document.getElementById('v-d').textContent   = fmt(D,1)+' Å'
+  document.getElementById('v-theta').textContent = th!==null ? th.toFixed(2)+'°' : '∅'
+
+  document.getElementById('results').innerHTML = HG.map(line => {
+    const s   = getSin(S.m,line.std,D)
+    const ok  = s<1
+    const th  = ok ? Math.asin(s)*180/Math.PI : null
+    const le  = ok ? (D*s)/S.m : null
+    const dev = le  ? Math.abs(le-line.std)/line.std*100 : null
+    const dc  = !dev    ? '#9a8f82'
+              : dev<1   ? '#1a6b3a'
+              : dev<3   ? '#8a5a00'
+              :           '#8b2a1a'
+
+    return `<div class="rc">
+      <div class="rc-swatch" style="background:${line.swatch}"></div>
+      <div class="rc-name">${line.name}</div>
+      <div class="rc-lam" style="color:${line.color}">${ok ? fmt(le,0) : '—'}</div>
+      <div class="rc-unit">Å</div>
+      <div class="rc-theta">${ok ? 'θ = '+th.toFixed(2)+'°' : 'not possible'}</div>
+      <div class="rc-dev" style="color:${dc}">${dev!==null ? '± '+dev.toFixed(2)+'%' : ''}</div>
+    </div>`
+  }).join('')
+
+  draw()
+}
+
+// ── Sliders ───────────────────────────────────────────────────────────────
+const sliders = [
+  [document.getElementById('sl-N'),   v => S.N   = +v],
+  [document.getElementById('sl-m'),   v => S.m   = +v],
+  [document.getElementById('sl-lam'), v => S.lam = +v],
+]
+
+sliders.forEach(([sl, setter]) => {
+  sl.addEventListener('input', e => { setter(e.target.value); trackFill(sl); update() })
+  trackFill(sl)
+})
+
+window.addEventListener('resize', update)
+update()
+</script>
+</body>
+</html>
