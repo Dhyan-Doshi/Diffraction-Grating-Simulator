@@ -33,5 +33,3 @@ Where:
 ## 👨‍💻 Author
 Dhyan
 
-## ⚠️ Note
-This project was developed with the assistance of AI tools and further customized and understood by the author.
